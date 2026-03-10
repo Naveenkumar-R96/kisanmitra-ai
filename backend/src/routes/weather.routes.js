@@ -1,4 +1,10 @@
+// backend/src/routes/weather.routes.js
 import express from 'express';
+import { getWeather } from '../controllers/weather.controller.js';
+import { protect } from '../middleware/auth.middleware.js';
+
 const router = express.Router();
-router.get('/test', (req, res) => res.json({ route: 'weather', status: 'ok' }));
+
+router.get('/', protect, getWeather);
+
 export default router;
