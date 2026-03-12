@@ -15,6 +15,7 @@ import marketRoutes from './routes/market.routes.js';
 import weatherRoutes from './routes/weather.routes.js';
 import schemeRoutes from './routes/scheme.routes.js';
 import communityRoutes from './routes/community.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -39,6 +40,7 @@ app.use('/api/market',    marketRoutes);
 app.use('/api/weather',   weatherRoutes);
 app.use('/api/schemes',   schemeRoutes);
 app.use('/api/community', communityRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,7 +1,7 @@
-// frontend/src/pages/schemes/Schemes.jsx
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { schemesApi } from '../../api/schemes.api';
+import { useTranslation } from 'react-i18next';
 
 const CATEGORY_CONFIG = {
   income_support: { emoji: '💰', color: 'text-green-400',  bg: 'bg-green-500/10  border-green-500/30'  },
@@ -17,35 +17,28 @@ export default function Schemes() {
     queryKey: ['schemes-matched'],
     queryFn: () => schemesApi.getMatched(),
   });
-
+  const { t } = useTranslation();
   const schemes = matched?.data || [];
 
   return (
     <div className="min-h-screen bg-gray-950 p-4 lg:p-8">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-white text-2xl font-bold mb-1">📋 सरकारी योजनाएं</h1>
-        <p className="text-gray-400 text-sm mb-6">
-          आपके प्रोफाइल के अनुसार {schemes.length} योजनाएं मिली हैं
-        </p>
+        <h1 className="text-white text-2xl font-bold mb-1">📋 {t('govtSchemes')}</h1>
+        <p className="text-gray-400 text-sm mb-6">{schemes.length} {t('schemesMatched')}</p>
       </motion.div>
 
-      {/* Matched badge */}
-      <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4 mb-6 
-                      flex items-center gap-3">
+      {/* AI match badge */}
+      <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4 mb-6 flex items-center gap-3">
         <span className="text-3xl">🎯</span>
         <div>
-          <p className="text-green-400 font-bold">AI मिलान</p>
-          <p className="text-gray-400 text-sm">
-            आप {schemes.length} योजनाओं के लिए पात्र हैं
-          </p>
+          <p className="text-green-400 font-bold">{t('aiMatched')}</p>
+          <p className="text-gray-400 text-sm">{t('eligible')} {schemes.length} {t('govtSchemes')}</p>
         </div>
       </div>
 
       {isLoading ? (
         <div className="space-y-4">
-          {[1,2,3].map(i => (
-            <div key={i} className="bg-gray-900 rounded-2xl h-32 animate-pulse" />
-          ))}
+          {[1,2,3].map(i => <div key={i} className="bg-gray-900 rounded-2xl h-32 animate-pulse" />)}
         </div>
       ) : (
         <div className="space-y-4">
@@ -56,34 +49,34 @@ export default function Schemes() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={`border rounded-2xl p-5 ${cfg.bg}`}>
+                className={`border rounded-2xl p-5 ${cfg.bg}`}
+              >
                 <div className="flex items-start gap-4">
                   <span className="text-3xl">{cfg.emoji}</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className="text-white font-bold">{scheme.shortName || scheme.name}</h3>
-                      {scheme.isNational &&
-                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 
-                                         rounded-full border border-blue-500/30">🇮🇳 राष्ट्रीय</span>}
+                      {scheme.isNational && (
+                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">
+                          {t('national')}
+                        </span>
+                      )}
                     </div>
                     <p className="text-gray-400 text-sm mb-3">{scheme.description}</p>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {scheme.benefits?.slice(0, 2).map((b, bi) => (
-                        <span key={bi} className="text-xs bg-white/5 text-gray-300 
-                                                   px-2 py-1 rounded-lg">✓ {b}</span>
+                        <span key={bi} className="text-xs bg-white/5 text-gray-300 px-2 py-1 rounded-lg">✓ {b}</span>
                       ))}
                     </div>
                     <div className="flex items-center gap-3">
                       {scheme.applicationUrl && (
                         <a href={scheme.applicationUrl} target="_blank" rel="noreferrer"
-                          className={`text-xs font-bold px-4 py-2 rounded-xl border 
-                                     transition-all hover:scale-105 ${cfg.bg} ${cfg.color}`}>
-                          आवेदन करें →
+                          className={`text-xs font-bold px-4 py-2 rounded-xl border transition-all hover:scale-105 ${cfg.bg} ${cfg.color}`}>
+                          {t('applyNow')}
                         </a>
                       )}
                       {scheme.helplineNumber && (
-                        <a href={`tel:${scheme.helplineNumber}`}
-                          className="text-xs text-gray-400 hover:text-white transition-all">
+                        <a href={`tel:${scheme.helplineNumber}`} className="text-xs text-gray-400 hover:text-white transition-all">
                           📞 {scheme.helplineNumber}
                         </a>
                       )}

@@ -1,0 +1,20 @@
+{
+  "name": "KisanMitra AI",
+  "short_name": "KisanMitra",
+  "description": "Smart AI Advisory for Indian Farmers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/kisan-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["agriculture", "lifestyle", "productivity"],
+  "lang": "hi"
+}

@@ -1,31 +1,29 @@
 // frontend/src/api/client.js
 import axios from 'axios';
-import toast from 'react-hot-toast';
 
 const client = axios.create({
   baseURL: '/api',
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' }
+  timeout: 30000,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach token to every request
+// Attach JWT on every request
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('km_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
-// Handle errors globally
+// Auto-logout on 401
 client.interceptors.response.use(
-  (response) => response.data,
+  (response) => response,
   (error) => {
-    const message = error.response?.data?.message || 'Something went wrong';
     if (error.response?.status === 401) {
       localStorage.removeItem('km_token');
-      localStorage.removeItem('km_user');
+      localStorage.removeItem('km_auth');
       window.location.href = '/login';
-    } else {
-      toast.error(message);
     }
     return Promise.reject(error);
   }
