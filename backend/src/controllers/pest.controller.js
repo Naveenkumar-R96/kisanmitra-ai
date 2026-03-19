@@ -7,7 +7,6 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../middleware/error.middleware.js';
 import multer from 'multer';
 
-// Store in memory temporarily
 const storage = multer.memoryStorage();
 export const upload = multer({
   storage,
@@ -22,10 +21,10 @@ export const upload = multer({
 export const analyzePest = asyncHandler(async (req, res) => {
   if (!req.file) throw new AppError('Image is required', 400);
 
-  // Forward image to Python AI service
+  // Forward image to Python AI service (uses Gemini)
   const form = new FormData();
   form.append('file', req.file.buffer, {
-    filename: req.file.originalname,
+    filename:    req.file.originalname,
     contentType: req.file.mimetype
   });
 
@@ -38,12 +37,13 @@ export const analyzePest = asyncHandler(async (req, res) => {
     );
     aiResult = aiResponse.data.data;
   } catch (err) {
+    console.error('Python AI service error:', err.message);
     throw new AppError('AI service unavailable. Please try again.', 503);
   }
 
-  // Save report to MongoDB
+  // Save to MongoDB
   const report = await PestReport.create({
-    farmer: req.user._id,
+    farmer:   req.user._id,
     imageUrl: `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
     aiResult: {
       disease:    aiResult.disease,
@@ -77,23 +77,32 @@ export const getPestHistory = asyncHandler(async (req, res) => {
   const reports = await PestReport.find({ farmer: req.user._id })
     .sort({ createdAt: -1 })
     .limit(20)
-    .select('-imageUrl'); // Don't return base64 in list
-
+    .select('-imageUrl');
   ApiResponse.success(res, reports, 'Pest history fetched');
 });
 
-// GET /api/pest/outbreaks — for admin heatmap
+// GET /api/pest/outbreaks
 export const getOutbreaks = asyncHandler(async (req, res) => {
   const outbreaks = await PestReport.aggregate([
-    { $match: { 'aiResult.isHealthy': false, createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } },
-    { $group: {
-      _id: { disease: '$aiResult.disease', district: '$location.district', state: '$location.state' },
-      count: { $sum: 1 },
-      avgConfidence: { $avg: '$aiResult.confidence' }
-    }},
-    { $sort: { count: -1 } },
+    {
+      $match: {
+        'aiResult.isHealthy': false,
+        createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+      }
+    },
+    {
+      $group: {
+        _id: {
+          disease:  '$aiResult.disease',
+          district: '$location.district',
+          state:    '$location.state'
+        },
+        count:         { $sum: 1 },
+        avgConfidence: { $avg: '$aiResult.confidence' }
+      }
+    },
+    { $sort:  { count: -1 } },
     { $limit: 50 }
   ]);
-
   ApiResponse.success(res, outbreaks, 'Outbreak data fetched');
 });

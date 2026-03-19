@@ -29,6 +29,21 @@ self.addEventListener('fetch', (e) => {
   const { request } = e;
   const url = new URL(request.url);
 
+  // Never cache JavaScript chunks or Vite modules - always network first
+  if (url.pathname.includes('.js') || url.pathname.includes('node_modules/.vite/deps')) {
+    e.respondWith(
+      fetch(request, { cache: 'no-store' })
+        .catch(() => {
+          // Return offline page or fallback
+          return new Response('Network error - please check your connection', {
+            status: 503,
+            statusText: 'Service Unavailable'
+          });
+        })
+    );
+    return;
+  }
+
   // Always network for API calls
   if (url.pathname.startsWith('/api')) {
     e.respondWith(
@@ -46,16 +61,22 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Cache first for static assets
+  // Cache first for static assets (images, fonts, etc)
   e.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
       return fetch(request).then(res => {
-        if (res.ok) {
+        if (res.ok && request.method === 'GET') {
           const clone = res.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
         }
         return res;
+      }).catch(() => {
+        // Fallback for offline
+        if (request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
+        return new Response('Offline');
       });
     })
   );

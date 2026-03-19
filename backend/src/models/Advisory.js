@@ -10,7 +10,7 @@ const advisorySchema = new mongoose.Schema({
   crop: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Crop',
-    required: true
+    required: false  // optional — not all advisories are crop-specific
   },
   date: {
     type: Date,
@@ -18,7 +18,7 @@ const advisorySchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['daily', 'weather_alert', 'pest_warning', 'irrigation', 'fertilizer', 'harvest'],
+    enum: ['daily', 'weather_alert', 'pest_warning', 'irrigation', 'fertilizer', 'harvest', 'general'],
     required: true
   },
   priority: {
@@ -26,25 +26,27 @@ const advisorySchema = new mongoose.Schema({
     enum: ['low', 'medium', 'high', 'urgent'],
     default: 'medium'
   },
-  title: { type: String, required: true },
+  title:   { type: String, required: true },
   message: { type: String, required: true },
   actions: [{
-    step: Number,
+    step:   Number,
     action: String,
-    timing: String       // "morning", "evening", "immediately"
+    timing: String
   }],
   weatherContext: {
     temperature: Number,
-    humidity: Number,
-    rainfall: Number,
-    condition: String
+    humidity:    Number,
+    rainfall:    Number,
+    condition:   String
   },
   cropStage: {
     type: String,
-    enum: ['sowing', 'germination', 'vegetative', 'flowering', 'fruiting', 'maturity', 'harvest']
+    enum: ['sowing', 'germination', 'vegetative', 'flowering', 'fruiting', 'maturity', 'harvest'],
+    default: 'vegetative'
   },
-  isRead: { type: Boolean, default: false },
-  isNotified: { type: Boolean, default: false }
+  language:    { type: String, default: 'en' },
+  isRead:      { type: Boolean, default: false },
+  isNotified:  { type: Boolean, default: false }
 }, { timestamps: true });
 
 advisorySchema.index({ farmer: 1, date: -1 });

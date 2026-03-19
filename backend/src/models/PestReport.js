@@ -7,49 +7,36 @@ const pestReportSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  crop: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Crop'
-  },
-  imageUrl: {
-    type: String,
-    required: true
-  },
+  imageUrl: { type: String },
   aiResult: {
-    disease: { type: String },
-    confidence: { type: Number },      // 0-100
-    severity: {
+    disease:    { type: String, required: true },
+    confidence: { type: Number, min: 0, max: 100 },
+    severity:   {
       type: String,
-      enum: ['mild', 'moderate', 'severe']
+      enum: ['mild', 'moderate', 'severe', 'unknown'],
+      default: 'mild'
     },
-    isHealthy: { type: Boolean, default: false }
+    isHealthy:  { type: Boolean, default: false }
   },
   treatment: {
-    chemical: [String],
-    organic: [String],
-    dosage: String,
-    timing: String,
+    chemical:           [String],
+    organic:            [String],
+    dosage:             String,
+    timing:             String,
     preventiveMeasures: [String]
   },
   location: {
     district: String,
-    state: String,
-    coordinates: {
-      lat: Number,
-      lng: Number
-    }
+    state:    String,
   },
-  expertVerified: { type: Boolean, default: false },
-  expertNote: { type: String },
   status: {
     type: String,
-    enum: ['pending', 'analyzed', 'verified'],
-    default: 'pending'
+    enum: ['pending', 'analyzed', 'failed'],
+    default: 'analyzed'
   }
 }, { timestamps: true });
 
-// Index for outbreak heatmap
-pestReportSchema.index({ 'location.district': 1, createdAt: -1 });
-pestReportSchema.index({ 'aiResult.disease': 1 });
+pestReportSchema.index({ farmer: 1, createdAt: -1 });
+pestReportSchema.index({ 'location.district': 1 });
 
 export default mongoose.model('PestReport', pestReportSchema);
