@@ -1,16 +1,15 @@
+// frontend/src/pages/community/Community.jsx
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { communityApi } from '../../api/community.api';
 import { useAuthStore } from '../../store/authSlice';
-import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 export default function Community() {
   const [newPost, setNewPost] = useState({ title: '', body: '', category: 'question' });
   const [showForm, setShowForm] = useState(false);
   const { user } = useAuthStore();
-  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -24,7 +23,7 @@ export default function Community() {
       queryClient.invalidateQueries(['community']);
       setNewPost({ title: '', body: '', category: 'question' });
       setShowForm(false);
-      toast.success(t('postBtn') + ' ✅');
+      toast.success('पोस्ट बन गई!');
     }
   });
 
@@ -35,13 +34,6 @@ export default function Community() {
 
   const posts = data?.data || [];
 
-  const CATEGORY_OPTIONS = [
-    { value: 'question',      label: `❓ ${t('question')}` },
-    { value: 'tip',           label: `💡 ${t('tip')}` },
-    { value: 'success_story', label: `🌟 ${t('successStory')}` },
-    { value: 'alert',         label: `⚠️ ${t('alert')}` },
-  ];
-
   const CATEGORY_COLORS = {
     question:      'bg-blue-500/20  text-blue-400',
     tip:           'bg-green-500/20 text-green-400',
@@ -49,19 +41,18 @@ export default function Community() {
     alert:         'bg-red-500/20   text-red-400',
   };
 
-  const CATEGORY_ICONS = { question: '❓', tip: '💡', success_story: '🌟', alert: '⚠️' };
-
   return (
     <div className="min-h-screen bg-gray-950 p-4 lg:p-8">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-white text-2xl font-bold">👥 {t('kisanCommunity')}</h1>
-          <p className="text-gray-400 text-sm">{t('communitySubtitle')}</p>
+          <h1 className="text-white text-2xl font-bold">👥 किसान समुदाय</h1>
+          <p className="text-gray-400 text-sm">Farmer community Q&A</p>
         </div>
         <button onClick={() => setShowForm(!showForm)}
-          className="bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 rounded-xl transition-all active:scale-95 text-sm">
-          {t('createPost')}
+          className="bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 
+                     rounded-xl transition-all active:scale-95 text-sm">
+          + पोस्ट करें
         </button>
       </motion.div>
 
@@ -71,31 +62,36 @@ export default function Community() {
           className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6">
           <select value={newPost.category}
             onChange={e => setNewPost({ ...newPost, category: e.target.value })}
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white mb-3 text-sm focus:outline-none focus:border-green-500">
-            {CATEGORY_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 
+                       text-white mb-3 text-sm focus:outline-none focus:border-green-500">
+            <option value="question">❓ सवाल</option>
+            <option value="tip">💡 टिप्स</option>
+            <option value="success_story">🌟 सफलता की कहानी</option>
+            <option value="alert">⚠️ चेतावनी</option>
           </select>
-          <input type="text" placeholder={t('writeTitle')}
+          <input type="text" placeholder="शीर्षक लिखें..."
             value={newPost.title}
             onChange={e => setNewPost({ ...newPost, title: e.target.value })}
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-green-500 transition-all"
-          />
-          <textarea placeholder={t('writeDetails')}
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 
+                       text-white placeholder-gray-500 mb-3 focus:outline-none 
+                       focus:border-green-500 transition-all" />
+          <textarea placeholder="विस्तार से लिखें..."
             value={newPost.body} rows={3}
             onChange={e => setNewPost({ ...newPost, body: e.target.value })}
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-green-500 transition-all"
-          />
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 
+                       text-white placeholder-gray-500 resize-none focus:outline-none 
+                       focus:border-green-500 transition-all" />
           <div className="flex gap-3 mt-3">
             <button onClick={() => setShowForm(false)}
-              className="flex-1 bg-gray-800 text-gray-300 py-2 rounded-xl text-sm font-medium hover:bg-gray-700">
-              {t('cancel')}
+              className="flex-1 bg-gray-800 text-gray-300 py-2 rounded-xl text-sm font-medium">
+              रद्द करें
             </button>
             <button
               onClick={() => createMutation.mutate(newPost)}
               disabled={!newPost.title || !newPost.body || createMutation.isPending}
-              className="flex-1 bg-green-600 hover:bg-green-500 disabled:bg-green-900 text-white py-2 rounded-xl text-sm font-bold transition-all">
-              {createMutation.isPending ? t('posting') : t('postBtn')}
+              className="flex-1 bg-green-600 hover:bg-green-500 disabled:bg-green-900 
+                         text-white py-2 rounded-xl text-sm font-bold transition-all">
+              {createMutation.isPending ? 'भेज रहे हैं...' : 'पोस्ट करें'}
             </button>
           </div>
         </motion.div>
@@ -109,7 +105,7 @@ export default function Community() {
       ) : posts.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-5xl mb-4">🌾</p>
-          <p>{t('noPostsYet')}</p>
+          <p>अभी कोई पोस्ट नहीं है। पहले पोस्ट करें!</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -118,22 +114,26 @@ export default function Community() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-5"
-            >
+              className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-green-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-9 h-9 bg-green-700 rounded-full flex items-center 
+                                  justify-center text-white font-bold text-sm">
                     {post.author?.name?.[0] || 'K'}
                   </div>
                   <div>
                     <p className="text-white text-sm font-semibold">{post.author?.name}</p>
                     <p className="text-gray-500 text-xs">
-                      {post.author?.location?.village} • {new Date(post.createdAt).toLocaleDateString()}
+                      {post.author?.location?.village} •{' '}
+                      {new Date(post.createdAt).toLocaleDateString('hi-IN')}
                     </p>
                   </div>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${CATEGORY_COLORS[post.category]}`}>
-                  {CATEGORY_ICONS[post.category]} {t(post.category === 'success_story' ? 'successStory' : post.category)}
+                <span className={`text-xs px-2 py-1 rounded-full font-medium 
+                                  ${CATEGORY_COLORS[post.category]}`}>
+                  {post.category === 'question'      ? '❓' :
+                   post.category === 'tip'           ? '💡' :
+                   post.category === 'success_story' ? '🌟' : '⚠️'} {post.category}
                 </span>
               </div>
 
@@ -142,12 +142,14 @@ export default function Community() {
 
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <button onClick={() => likeMutation.mutate(post._id)}
-                  className={`flex items-center gap-1.5 transition-all hover:text-red-400 ${post.likes?.includes(user?._id) ? 'text-red-400' : ''}`}>
+                  className={`flex items-center gap-1.5 transition-all hover:text-red-400
+                    ${post.likes?.includes(user?._id) ? 'text-red-400' : ''}`}>
                   ❤️ {post.likes?.length || 0}
                 </button>
-                <span>💬 {post.replies?.length || 0} {t('replies')}</span>
+                <span>💬 {post.replies?.length || 0} जवाब</span>
                 <span>👁️ {post.views || 0}</span>
-                {post.isSolved && <span className="ml-auto text-green-400 font-medium">{t('solved')}</span>}
+                {post.isSolved &&
+                  <span className="ml-auto text-green-400 font-medium">✅ हल हो गया</span>}
               </div>
             </motion.div>
           ))}
