@@ -31,7 +31,7 @@ export default function Dashboard() {
 
   const { data: weatherData } = useQuery({
     queryKey: ['weather'],
-    queryFn:  () => weatherApi.get(
+    queryFn: () => weatherApi.get(
       user?.location?.coordinates?.lat || 30.9,
       user?.location?.coordinates?.lng || 75.8
     ),

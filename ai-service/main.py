@@ -24,3 +24,5 @@ app.include_router(advisory_router, prefix="/advisory")
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "KisanMitra AI", "version": "1.0.0"}
+""" python -m uvicorn main:app --reload --port 8000
+ """
