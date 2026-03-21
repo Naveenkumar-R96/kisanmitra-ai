@@ -12,9 +12,26 @@ const LANGUAGES = [
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
-  const changeLanguage = (code) => {
+  const changeLanguage = async (code) => {
     i18n.changeLanguage(code);
     localStorage.setItem('km_lang', code);
+  
+    // Also update user profile in backend
+    try {
+      const token = localStorage.getItem('km_token');
+      if (token) {
+        await fetch('/api/auth/update-profile', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ language: code })
+        });
+      }
+    } catch (e) {
+      console.log('Language update failed:', e);
+    }
   };
 
   return (
