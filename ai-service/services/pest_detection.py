@@ -343,3 +343,4 @@ def analyze_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
     img_hash = hashlib.md5(image_bytes[:2000]).hexdigest()
     index    = int(img_hash[:2], 16) % len(FALLBACK)
     return FALLBACK[index]
+
