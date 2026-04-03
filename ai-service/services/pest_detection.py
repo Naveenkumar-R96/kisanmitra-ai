@@ -76,6 +76,70 @@ IMAGE_TRANSFORM = transforms.Compose([
 _model      = None
 _model_path = os.path.join(os.path.dirname(__file__), '..', 'plant_disease_model.pth')
 
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
+
+HF_HEADERS = {
+    "Authorization": "Bearer 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",
+    "Content-Type": "image/jpeg"
+}
+
+def analyze_with_huggingface(image_bytes):
+    try:
+        import requests
+
+        response = requests.post(HF_API_URL, headers=HF_HEADERS, data=image_bytes)
+
+        if response.status_code != 200:
+            raise Exception(f"HF Error: {response.text}")
+
+        result = response.json()
+
+        top = result[0]
+        label = top["label"]
+        score = top["score"] * 100
+
+        parts = label.split(" with ")
+        crop = parts[0] if len(parts) > 0 else "Unknown"
+        disease = parts[1] if len(parts) > 1 else label
+
+        is_healthy = "healthy" in label.lower()
+
+        treatment = get_treatment(disease)
+        info = get_disease_info(disease)
+
+        print(f"✅ HuggingFace: {label} ({score:.2f}%)")
+
+        return {
+            "isHealthy": is_healthy,
+            "disease": "Healthy Plant" if is_healthy else disease,
+            "confidence": round(score, 2),
+            "severity": "mild" if is_healthy else ("severe" if score > 80 else "moderate"),
+            "affectedPart": "leaf",
+            "cropType": crop,
+            "symptoms": info["symptoms"],
+            "causes": info["causes"],
+            "treatment": {
+                "chemical": treatment["chemical"],
+                "organic": treatment["organic"],
+                "dosage": "500 litres per acre",
+                "timing": "Morning or evening",
+                "frequency": "Every 7 days"
+            },
+            "preventiveMeasures": [
+                "Use disease-free seeds",
+                "Avoid overwatering",
+                "Regular monitoring"
+            ],
+            "urgency": "within_3_days",
+            "spreadRisk": "medium",
+            "estimatedYieldLoss": "20-30% if untreated",
+            "modelUsed": "HuggingFace MobileNet"
+        }
+
+    except Exception as e:
+        print(f"⚠️ HuggingFace failed: {e}")
+        return None
+
 def load_model():
     global _model
     if _model is not None:
@@ -141,6 +205,10 @@ Rules:
 
 
 def analyze_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
+    
+    hf_result = analyze_with_huggingface(image_bytes)
+    if hf_result:
+        return hf_result
 
     # ── Try new google-genai SDK first ──
     try:
