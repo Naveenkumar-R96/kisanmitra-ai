@@ -5,6 +5,19 @@ const resources = {
 
   en: {
     translation: {
+      postSuccess: 'Post created successfully!',
+      myProfile: 'My Profile',
+      accountInfo: 'Account Information',
+      phone2: 'Phone',
+      farmLand: 'Land',
+      soil: 'Soil Type',
+      irrigation: 'Irrigation',
+      language: 'Language',
+      role: 'Role',
+      verified: '✓ Verified',
+      logoutBtn: '🚪 Logout',
+      editProfile: 'Edit Profile',
+      saveChanges: 'Save Changes',
       appName: 'KisanMitra AI',
       appTagline: 'Smart Farming, Better Life',
       dashboard: 'Dashboard',
@@ -171,6 +184,19 @@ const resources = {
 
   hi: {
     translation: {
+      postSuccess: 'पोस्ट बन गई!',
+      myProfile: 'मेरी प्रोफाइल',
+      accountInfo: 'खाते की जानकारी',
+      phone2: 'फोन',
+      farmLand: 'भूमि',
+      soil: 'मिट्टी',
+      irrigation: 'सिंचाई',
+      language: 'भाषा',
+      role: 'भूमिका',
+      verified: '✓ सत्यापित',
+      logoutBtn: '🚪 लॉग आउट',
+      editProfile: 'प्रोफाइल संपादित करें',
+      saveChanges: 'परिवर्तन सहेजें',
       cropWheat: 'गेहूं', cropRice: 'चावल', cropMaize: 'मक्का',
       cropCotton: 'कपास', cropMustard: 'सरसों', cropOnion: 'प्याज',
       cropPotato: 'आलू', cropTomato: 'टमाटर', cropGarlic: 'लहसुन',
@@ -336,6 +362,19 @@ const resources = {
 
   pa: {
     translation: {
+      postSuccess: 'पोस्ट बन गई!',
+      myProfile: 'मेरी प्रोफाइल',
+      accountInfo: 'खाते की जानकारी',
+      phone2: 'फोन',
+      farmLand: 'भूमि',
+      soil: 'मिट्टी',
+      irrigation: 'सिंचाई',
+      language: 'भाषा',
+      role: 'भूमिका',
+      verified: '✓ सत्यापित',
+      logoutBtn: '🚪 लॉग आउट',
+      editProfile: 'प्रोफाइल संपादित करें',
+      saveChanges: 'परिवर्तन सहेजें',
       appName: 'ਕਿਸਾਨਮਿੱਤਰ AI',
       appTagline: 'ਸਮਾਰਟ ਖੇਤੀ, ਬਿਹਤਰ ਜ਼ਿੰਦਗੀ',
       dashboard: 'ਡੈਸ਼ਬੋਰਡ',
@@ -995,6 +1034,7 @@ const resources = {
   },
 
 };
+
 
 i18n.use(initReactI18next).init({
   resources,
